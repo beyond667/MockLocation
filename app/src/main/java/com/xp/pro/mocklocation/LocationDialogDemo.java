@@ -1,7 +1,9 @@
 package com.xp.pro.mocklocation;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.xp.pro.mocklocationlib.LocationBean;
@@ -10,11 +12,14 @@ import com.xp.pro.mocklocationlib.LocationDialog;
 public class LocationDialogDemo extends Activity {
     LocationBean mLocationBean;
 
+    @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initMockLocationData();
         createLocationDialog();
+        requestPermissions(new String[]{ android.Manifest.permission.ACCESS_FINE_LOCATION,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
     }
 
     private void initMockLocationData() {

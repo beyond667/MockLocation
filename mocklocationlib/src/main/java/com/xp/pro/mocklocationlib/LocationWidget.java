@@ -1,14 +1,20 @@
 package com.xp.pro.mocklocationlib;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -28,8 +34,8 @@ public class LocationWidget extends LinearLayout {
     private Context context;
     private TextView tvProvider = null;
     private TextView tvTime = null;
-    private TextView tvLatitude = null;
-    private TextView tvLongitude = null;
+    private EditText tvLatitude = null;
+    private EditText tvLongitude = null;
     private TextView tvSystemMockPositionStatus = null;
     private Button btnStartMock = null;
     private Button btnStopMock = null;
@@ -59,8 +65,8 @@ public class LocationWidget extends LinearLayout {
         View layout = LayoutInflater.from(context).inflate(R.layout.location_wiget_layout, this, true);
         tvProvider = (TextView) layout.findViewById(R.id.tv_provider);
         tvTime = (TextView) layout.findViewById(R.id.tv_time);
-        tvLatitude = (TextView) layout.findViewById(R.id.tv_latitude);
-        tvLongitude = (TextView) layout.findViewById(R.id.tv_longitude);
+        tvLatitude = layout.findViewById(R.id.tv_latitude);
+        tvLongitude = layout.findViewById(R.id.tv_longitude);
         tvSystemMockPositionStatus = (TextView) findViewById(R.id.tv_system_mock_position_status);
         locationWigdetTipIv = (ImageView) findViewById(R.id.location_wigdet_tip_iv);
         locationWigdetDataLl = (LinearLayout) findViewById(R.id.location_wigdet_data_ll);
@@ -84,7 +90,27 @@ public class LocationWidget extends LinearLayout {
         mockLocationManager.initService(context);
 
         mockLocationManager.startThread();
+        getLocationCache();
+    }
 
+    private void saveData(){
+        //步骤1：创建一个SharedPreferences对象
+        SharedPreferences sharedPreferences= context.getSharedPreferences("data",Context.MODE_PRIVATE);
+        //步骤2： 实例化SharedPreferences.Editor对象
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        //步骤3：将获取过来的值放入文件
+        editor.putString("latitude", tvLatitude.getText().toString());
+        editor.putString("longitude", tvLongitude.getText().toString());
+        //步骤4：提交
+        editor.commit();
+    }
+
+    private void getLocationCache(){
+        SharedPreferences sharedPreferences= context.getSharedPreferences("data", Context .MODE_PRIVATE);
+        String latitude=sharedPreferences.getString("latitude","");
+        String longitude=sharedPreferences.getString("longitude","");
+        tvLatitude.setText(latitude);
+        tvLongitude.setText(longitude);
     }
 
     /**
@@ -100,13 +126,16 @@ public class LocationWidget extends LinearLayout {
      * 停止模拟定位
      */
     public void startMock() {
+        saveData();
         if (mockLocationManager.getUseMockPosition(context)) {
+            mockLocationManager.setLocationData(Double.parseDouble(tvLatitude.getText().toString()), Double.parseDouble(tvLongitude.getText().toString()));
             startMockLocation();
             btnStartMock.setEnabled(false);
             btnStopMock.setEnabled(true);
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     public void refreshData() {
         // 判断系统是否允许模拟位置，并addTestProvider
         if (mockLocationManager.getUseMockPosition(context)) {
@@ -127,6 +156,18 @@ public class LocationWidget extends LinearLayout {
             tvSystemMockPositionStatus.setText("未开启");
             locationWigdetTipIv.setVisibility(View.VISIBLE);
             locationWigdetDataLl.setVisibility(View.GONE);
+        }
+
+
+        if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    Activity#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
         }
         mockLocationManager.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
     }
@@ -174,8 +215,8 @@ public class LocationWidget extends LinearLayout {
     private void setLocationData(Location location) {
         tvProvider.setText(location.getProvider());
         tvTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(location.getTime())));
-        tvLatitude.setText(location.getLatitude() + " °");
-        tvLongitude.setText(location.getLongitude() + " °");
+//        tvLatitude.setText(location.getLatitude() + " °");
+//        tvLongitude.setText(location.getLongitude() + " °");
     }
 
     public void setMangerLocationData(double lat, double lon) {

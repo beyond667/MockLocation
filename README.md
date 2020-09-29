@@ -1,4 +1,7 @@
 # Android 实现模拟地图定位功能
+###  使用步骤：
+输入经纬度，点开始模拟，默认记录上次输入的内容
+
 
 ###  一、项目git地址：
 &emsp;&emsp;https://github.com/XieXiePro/MockLocation

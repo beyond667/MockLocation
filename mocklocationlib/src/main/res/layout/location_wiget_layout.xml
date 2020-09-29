@@ -78,12 +78,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
-                        android:text="纬度："
+                        android:text="经度："
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tv_latitude"
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:id="@+id/tv_longitude"
+                        android:layout_width="match_parent"
+                        android:hint="经度"
                         android:layout_height="wrap_content"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -98,13 +99,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
-                        android:text="经度："
+                        android:text="纬度："
                         android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tv_longitude"
-                        android:layout_width="wrap_content"
+                    <EditText
+                        android:id="@+id/tv_latitude"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:hint="纬度："
                         android:textSize="16sp" />
                 </LinearLayout>
 
